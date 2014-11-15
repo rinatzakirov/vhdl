@@ -7,28 +7,28 @@ use IEEE.numeric_std.all;
 entity stream_to_avalon is
   port
   (
-    stream_clk: in std_logic;
-    stream_rst: in std_logic;
-    stream_data: in std_logic_vector(15 downto 0);
-    stream_valid: in std_logic;
-    stream_ready: out std_logic;
+    stream_clk   : in  std_logic                    ;
+    stream_rst   : in  std_logic                    ;
+    stream_valid : in  std_logic                    ;
+    stream_ready : out std_logic                    ;
+    stream_data  : in  std_logic_vector(15 downto 0);
     
     clk: in std_logic;
     rst: in std_logic;
+
+    ctl_write             : in  std_logic                      ;
+    ctl_read              : in  std_logic                      ;
+    ctl_address           : in  std_logic_vector(3 downto 0)   ;
+    ctl_writedata         : in  std_logic_vector(31 downto 0)  ;
+    ctl_readdata          : out std_logic_vector(31 downto 0)  ;
+    ctl_waitrequest       : out std_logic                      ;
+    ctl_readdatavalid     : out std_logic                      ;
     
-    ctl_write: in std_logic;
-    ctl_read: in std_logic;
-    ctl_address: in std_logic_vector(3 downto 0);
-    ctl_writedata: in std_logic_vector(31 downto 0);
-    ctl_readdata: out std_logic_vector(31 downto 0);
-    ctl_waitrequest: out std_logic;
-    ctl_readdatavalid: out std_logic;
-    
-    writer_write: out std_logic;
-    writer_waitrequest: in std_logic;
-    writer_address: out std_logic_vector(31 downto 0);
-    writer_burstcount: out std_logic_vector(9 downto 0);
-    writer_writedata: out std_logic_vector(127 downto 0)
+    writer_write          : out std_logic                      ;
+    writer_waitrequest    : in  std_logic                      ;
+    writer_address        : out std_logic_vector(31 downto 0)  ;
+    writer_burstcount     : out std_logic_vector(9 downto 0)   ;
+    writer_writedata      : out std_logic_vector(127 downto 0)
   );
 end entity;
 
