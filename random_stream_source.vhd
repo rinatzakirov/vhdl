@@ -9,7 +9,8 @@ entity random_stream_source is
     speed: real    := 1.0;
     bw   : integer := 8;
     seed1: positive := 55352;
-    seed2: positive := 23124
+    seed2: positive := 23124;
+    incrementing: boolean := false
   );
   port
   (
@@ -27,15 +28,17 @@ begin
 
   out_valid <= out_valid_i;
 
-  process
+  process(clk)
   variable rand: real;
   variable seed1var: positive := seed1;
   variable seed2var: positive := seed2;
+  variable count: integer := 0;
   begin
     if rising_edge(clk) then
       if rst = '1' then
         out_valid_i <= '0';
         out_data <= (others => '0');
+        count := 0;
       else
         uniform(seed1var, seed2var, rand);
         if rand < speed then
@@ -45,7 +48,12 @@ begin
         end if;
         
         if out_valid_i = '1' and out_ready = '1' then
-          out_data <= std_logic_vector(to_unsigned(INTEGER(TRUNC(rand * 1048577.0)), bw));
+          if incrementing then
+            count := count + 1;
+            out_data <= std_logic_vector(to_unsigned(count, bw));
+          else
+            out_data <= std_logic_vector(to_unsigned(INTEGER(TRUNC(rand * 1048577.0)), bw));
+          end if;
         end if;
       end if;
     end if;

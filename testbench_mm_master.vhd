@@ -12,7 +12,7 @@ package testbench_mm_master_pkg is
   constant do_goto: integer := 3;
   
   type instruction_t is array(integer range <>) of integer;
-  type instructions_t is array(integer range <>) of instruction_t(0 to 2);
+  type instructions_t is array(positive range <>) of instruction_t(0 to 2);
 end package;
 
 use work.testbench_mm_master_pkg.all;
@@ -52,7 +52,7 @@ begin
   begin
     if rising_edge(clk) then
       if rst = '1' then
-        pc := 0;
+        pc := 1;
         state <= s_idle;
         mm_write <= '0';
         mm_address <= (others => '0');
@@ -63,8 +63,8 @@ begin
           if instructions(pc)(0) = do_write then
             state <= s_write;
             mm_write <= '1';
-            mm_address <= toSlv(instructions(pc)(1), 31);
-            mm_writedata <= toSlv(instructions(pc)(2), 31);
+            mm_address <= toSlv(instructions(pc)(1), 32);
+            mm_writedata <= toSlv(instructions(pc)(2), 32);
             pc := pc + 1;
           end if;
           if instructions(pc)(0) = do_goto then

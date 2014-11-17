@@ -362,7 +362,8 @@ entity fifo is
   generic (
     RESET_ACTIVE_LEVEL : std_ulogic := '1';
     MEM_SIZE           : positive;
-    SYNC_READ          : boolean    := true
+    SYNC_READ          : boolean    := true;
+    READ_AHEAD         : boolean    := true
     );
   port (
     Wr_clock : in std_ulogic;
@@ -397,7 +398,11 @@ architecture rtl of fifo is
   constant ADDR_SIZE               : natural := bit_size(MEM_SIZE-1);
   signal   head_sulv, head_rd_sulv : std_ulogic_vector(ADDR_SIZE-1 downto 0);
   signal   tail_sulv, tail_wr_sulv : std_ulogic_vector(ADDR_SIZE-1 downto 0);
+  
+  signal ReadAhead: std_ulogic;
 begin
+
+  ReadAhead <= '1' when READ_AHEAD else Re;
 
   dpr : dual_port_ram
     generic map (
@@ -411,7 +416,7 @@ begin
       Wr_data  => Wr_data,
 
       Rd_clock => Rd_clock,
-      Re       => Re,
+      Re       => ReadAhead,
       Rd_addr  => tail,
       Rd_data  => Rd_data
       );

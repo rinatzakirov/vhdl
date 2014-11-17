@@ -28,13 +28,18 @@ begin
     wait for (500 ns / freq);
     clk_i <= not clk_i;
     uniform(seed1, seed2, rnd_var);
-    rnd <= rnd_var;
+    rnd <= rnd_var after 10 ps;
   end process;
 
-  process
+  process(clk_i)
+  variable count: integer := 0;
   begin
-    wait for 100 ns;
-    rst <= '0';
+    if rising_edge(clk_i) then
+      count := count + 1;
+      if count = 10 then
+        rst_i <= '0';
+      end if;
+    end if;
   end process;
 
 end architecture;

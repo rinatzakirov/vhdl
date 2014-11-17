@@ -41,7 +41,7 @@ architecture syn of stream_to_avalon is
 
   signal stream_wideData, out_data: std_ulogic_vector(avalon_bw - 1 downto 0);
   signal stream_was_full, stream_we, reset_stream_was_full, stream_start, writer_valid, writer_ready, ws_stream_start, stream_start_r, ws_stream_stop, stream_stop_r, stream_stop, writer_fifo_rst,
-         stream_ready_i, writer_write_i, ws_almost_empty, ws_empty, zero_fill, fifo_empty, keep_going, ws_stream_was_full, ws_stream_was_full_r,
+         stream_ready_i, writer_write_i, ws_almost_empty, zero_fill, fifo_empty, keep_going, ws_stream_was_full, ws_stream_was_full_r,
          writer_enough_data, writer_start, writer_busy, ws_stream_busy, ws_stream_busy_r, stream_busy, burst_active, ws_fifo_reset, rs_fifo_reset_r, rs_fifo_reset, stream_fifo_rst: std_ulogic;
   signal writer_burstWritten: integer range 0 to burst_size - 1;
   signal sample_count: integer range 0 to (avalon_bw / stream_bw) - 1;
@@ -59,20 +59,19 @@ begin
   fifo_inst: entity work.TwoClockStreamFifo
   generic map
   (
-    MEM_SIZE  => burst_size * 2,
-    SYNC_READ => true
+    MEM_SIZE  => burst_size * 2
   )
   port map
   (
     in_clk   => stream_clk       ,
-    in_rst   => stream_fifo_rst       ,
+    in_rst   => stream_fifo_rst  ,
     in_data  => stream_wideData  ,
     in_valid => stream_we        ,
-    in_ready => stream_ready_i     ,
+    in_ready => stream_ready_i   ,
 
-    out_clk   => clk      ,
+    out_clk   => clk             ,
     out_rst   => writer_fifo_rst ,
-    out_data  => out_data,
+    out_data  => out_data        ,
     out_valid => writer_valid    ,
     out_ready => writer_ready    ,
 
@@ -108,14 +107,18 @@ begin
           if stream_start = '1' then
               stream_busy <= '1';
           end if;
+          --
           sample_count <= 0;
           stream_we <= '0';
         else
           if stream_stop = '1' then
-              stream_busy <= '0';
+            stream_busy <= '0';
           end if;
-          if stream_valid = '1' then
+          --
+          if stream_ready_i = '1' then
             stream_we <= '0';
+          end if;
+          if stream_valid = '1' and stream_ready_i = '1' then
             if write_little_endian then
               stream_wideData <= toSuv(stream_data) & stream_wideData(avalon_bw - 1 downto stream_bw);
             else
@@ -123,9 +126,7 @@ begin
             end if;
             if sample_count = (avalon_bw / stream_bw) - 1 then
               sample_count <= 0;
-              if stream_ready_i = '1' then
-                stream_we <= '1';
-              end if;
+              stream_we <= '1';
             else
               sample_count <= sample_count + 1;
             end if;

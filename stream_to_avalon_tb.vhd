@@ -9,7 +9,7 @@ use work.testbench_mm_master_pkg.all;
 entity stream_to_avalon_tb is
 end entity;
 
-architecture syn of stream_to_avalon_tb is
+architecture sim of stream_to_avalon_tb is
 
   signal stream_valid : std_logic                    ;
   signal stream_ready : std_logic                    ;
@@ -42,7 +42,7 @@ begin
   );
   
   source: entity work.random_stream_source
-  generic map (speed => 0.1, bw => 16)
+  generic map (speed => 0.1, bw => 16, incrementing => true)
   port map
   (
     clk        => clk                 ,
@@ -50,7 +50,9 @@ begin
     out_valid  => stream_valid        ,
     out_ready  => stream_ready        ,
     out_data   => stream_data         
-  );
+  );			  
+  
+  writer_waitrequest <= '1' when rnd > 0.01 else '0';
 
   dut: entity work.stream_to_avalon
   port map
@@ -80,7 +82,11 @@ begin
   );
   
   tb_sm: entity work.testbench_mm_master generic map (instructions => (
-    (do_write, 0, 0),
+    (do_write, 1, 1024),
+	(do_write, 2, 8192),
+	(do_write, 0, 1),
+	(do_write, 0, 2),
+	(do_write, 0, 0),
     (do_idle, 0, 0)
   )) port map
   (
