@@ -58,8 +58,13 @@ class ad9650_spi(object):
     print "CHIP_ID = %02X" % self.readReg(self.CHIP_ID_REG)
     print "CHIP_GRADE = %02X" % self.readReg(self.CHIP_GRADE_REG)
     print "OUTPUT_MODE = %02X" % self.readReg(self.OUTPUT_MODE_REG)
-    self.writeReg(self.OUTPUT_MODE_REG, 0x20)
-    print "OUTPUT_MODE = %02X" % self.readReg(self.OUTPUT_MODE_REG)
+    self.outputDDR(False)
+    
+  def outputDDR(isDDR):
+    if isDDR:
+      self.writeReg(self.OUTPUT_MODE_REG, 0x20)
+    else:
+      self.writeReg(self.OUTPUT_MODE_REG, 0x00)
     self.writeReg(self.TRANSFER_REG, 0x01)
     print "OUTPUT_MODE = %02X" % self.readReg(self.OUTPUT_MODE_REG)
     

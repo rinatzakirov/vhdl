@@ -5,13 +5,17 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity stream_to_avalon is
+  generic
+  (
+    STREAM_BW: integer := 32
+  );
   port
   (
     stream_clk   : in  std_logic                    ;
     stream_rst   : in  std_logic                    ;
     stream_valid : in  std_logic                    ;
     stream_ready : out std_logic                    ;
-    stream_data  : in  std_logic_vector(15 downto 0);
+    stream_data  : in  std_logic_vector(STREAM_BW - 1 downto 0);
     
     clk: in std_logic;
     rst: in std_logic;
@@ -37,7 +41,6 @@ architecture syn of stream_to_avalon is
   constant burst_size: integer := 256;
   
   constant avalon_bw: integer := writer_writedata'length;
-  constant stream_bw: integer := stream_data'length;
 
   signal stream_wideData, out_data: std_ulogic_vector(avalon_bw - 1 downto 0);
   signal stream_was_full, stream_we, reset_stream_was_full, stream_start, writer_valid, writer_ready, ws_stream_start, stream_start_r, ws_stream_stop, stream_stop_r, stream_stop, writer_fifo_rst,
