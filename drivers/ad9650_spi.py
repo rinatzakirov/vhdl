@@ -60,7 +60,7 @@ class ad9650_spi(object):
     print "OUTPUT_MODE = %02X" % self.readReg(self.OUTPUT_MODE_REG)
     self.outputDDR(False)
     
-  def outputDDR(isDDR):
+  def outputDDR(self, isDDR):
     if isDDR:
       self.writeReg(self.OUTPUT_MODE_REG, 0x20)
     else:
